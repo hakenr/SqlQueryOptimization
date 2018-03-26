@@ -1,8 +1,7 @@
 /*
-	"FK CONSTRAINTS nepoužívám, protože mi komplikují život pøi hromadných importech dat. Napø. poøadí vkládání záznamù."
+	"I don't use FK CONSTRAINTS, they complicate my life within mass data imports. I don't want to care of the statements order."
 */
 
-USE AdventureWorks2012
 SET XACT_ABORT ON
 BEGIN TRANSACTION
 
@@ -20,10 +19,10 @@ BEGIN TRANSACTION
 	SELECT * FROM Sales.CurrencyRate WHERE ToCurrencyCode='WUD'
 
 	-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	-- Pozor na "WITH CHECK"!! 
+	-- "WITH CHECK"!! 
 	EXEC sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL"
 	-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	SELECT * FROM Sales.CurrencyRate WHERE ToCurrencyCode='WUD'
 
-ROLLBACK TRANSACTION -- Jen demo, v produkci samozøejmì COMMIT, ošetøit chyby, atp.
+ROLLBACK TRANSACTION -- Just demo

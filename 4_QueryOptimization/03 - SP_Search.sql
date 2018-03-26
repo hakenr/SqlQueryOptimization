@@ -1,4 +1,5 @@
-USE AdventureWorks2012
+-- "Parameter sniffing"
+
 DROP PROCEDURE SalesOrderHeader_Search
 GO
 

@@ -4,28 +4,38 @@ SELECT TOP 10 * FROM sys.dm_exec_query_stats
 -- + funkce sys.dm_exec_query_plan
 
 -- Most expensive queries
-SELECT TOP 10 SUBSTRING(qt.TEXT, (qs.statement_start_offset/2)+1,
-	((CASE qs.statement_end_offset
-		WHEN -1 THEN DATALENGTH(qt.TEXT)
-		ELSE qs.statement_end_offset
-		END - qs.statement_start_offset)/2)+1),
-	qs.last_elapsed_time/1000 last_elapsed_time_ms,
-	qs.last_worker_time/1000 last_worker_time_ms,
-	qs.execution_count,
-	qs.total_elapsed_time/1000 total_elapsed_time_ms,
-	qs.total_worker_time/1000 total_worker_time_ms,
-	qs.last_execution_time,
-	qs.total_logical_reads, qs.last_logical_reads,
-	qs.total_logical_writes, qs.last_logical_writes
-	--qp.query_plan
-	FROM sys.dm_exec_query_stats qs
-		CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) qt
-		CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) qp
-	WHERE qt.dbid = (SELECT database_id FROM sys.databases WHERE name='DatabaseName')
-	-- ORDER BY qs.total_logical_reads DESC
-	-- ORDER BY qs.total_logical_writes DESC
-	-- ORDER BY qs.last_worker_time DESC -- CPU time (active)
-	ORDER BY qs.last_elapsed_time DESC -- clock time (vèetnì èekání na locky, atp.)
+SELECT TOP 20
+    SUBSTRING(qt.TEXT, (qs.statement_start_offset/2)+1,
+        ((CASE qs.statement_end_offset
+            WHEN -1 THEN DATALENGTH(qt.TEXT)
+            ELSE qs.statement_end_offset
+            END - qs.statement_start_offset)/2)+1)
+        AS query_text,
+    db.name AS [db_name],
+    qs.total_elapsed_time/1000 AS total_elapsed_time_ms,
+    qs.total_elapsed_time/qs.execution_count/1000 AS average_elapsed_time_ms,
+    qs.last_elapsed_time/1000 AS last_elapsed_time_ms,
+    qs.execution_count,
+    qs.total_worker_time/1000 AS total_worker_time_ms,
+    qs.total_worker_time/qs.execution_count/1000 AS average_worker_time_ms,
+    qs.last_worker_time/1000 AS last_worker_time_ms,
+    qs.last_execution_time,
+    qs.total_logical_reads,
+    qs.last_logical_reads,
+    qs.total_logical_writes,
+    qs.last_logical_writes
+    --qp.query_plan
+    FROM sys.dm_exec_query_stats qs
+        CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) qt
+        CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) qp
+        LEFT JOIN sys.databases db ON (qt.dbid = db.database_id)
+    -- WHERE db.name='DatabaseName'
+    -- ORDER BY qs.total_logical_reads DESC
+    -- ORDER BY qs.total_logical_writes DESC
+    -- ORDER BY qs.last_worker_time DESC -- CPU time (active)
+    -- ORDER BY qs.last_elapsed_time DESC -- clock time (vèetnì èekání na locky, atp.)
+    -- ORDER BY qs.total_worker_time DESC
+    ORDER BY qs.total_elapsed_time DESC
 
 
 

@@ -1,20 +1,19 @@
-USE AdventureWorks2012
--- Zapnout Include Actual Execution Plan (Ctrl+M)
+-- Include Actual Execution Plan (Ctrl+M)
 
 BEGIN TRANSACTION
 
-	-- Zkopírujeme data do nové tabulky, ta nemá žádné indexy, ani primární klíè
+	-- Copy data to new table (no PK, index, ...)
 	SELECT * 
-		INTO SalesOrderHeader_BezPrimarnihoKlice
+		INTO SalesOrderHeader_Heap
 		FROM Sales.SalesOrderHeader
 
 	-- TableScan
-	SELECT SalesOrderID FROM SalesOrderHeader_BezPrimarnihoKlice
+	SELECT SalesOrderID FROM SalesOrderHeader_Heap
 		WHERE (SalesOrderID BETWEEN 60000 AND 65000)
 
 ROLLBACK
 
--- Clustered Index Scan (+ doporuèený index)
+-- Clustered Index Scan (+ suggested index)
 SELECT PurchaseOrderNumber FROM Sales.SalesOrderHeader
 	WHERE (ShipDate >= GETDATE())
 
@@ -40,19 +39,19 @@ SELECT ShipDate FROM Sales.SalesOrderHeader
 
 
 
--- ==== Pokud èas dovolí / pro vlastní pokusy ===
+-- ==== If time permits / own experiments ===
 
 -- OPTIONAL: RID Lookup
 BEGIN TRANSACTION
 	SELECT * 
-		INTO SalesOrderHeader_BezPrimarnihoKlice
+		INTO SalesOrderHeader_Heap
 		FROM Sales.SalesOrderHeader
 
-	-- RID Lookup (dohledávání v Heapu bez Clustered Indexu)
-	CREATE INDEX ix ON SalesOrderHeader_BezPrimarnihoKlice (ShipDate)
-	SELECT * FROM SalesOrderHeader_BezPrimarnihoKlice WHERE ShipDate = GETDATE()
+	-- RID Lookup (lookup in Heapu without Clustered Index)
+	CREATE INDEX ix ON SalesOrderHeader_Heap (ShipDate)
+	SELECT * FROM SalesOrderHeader_Heap WHERE ShipDate = GETDATE()
 ROLLBACK
 
 
--- OPTIONAL: Constant Scan (uvidíme pozdìji, viz vyhledávání dle data)
+-- OPTIONAL: Constant Scan
 SELECT 1 WHERE 1 IN (1,2,3,4,5)

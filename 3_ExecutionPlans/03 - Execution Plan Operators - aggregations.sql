@@ -1,7 +1,6 @@
-USE AdventureWorks2012
--- Zapnout Include Actual Execution Plan (Ctrl+M)
+-- Include Actual Execution Plan (Ctrl+M)
 
--- Stream Aggregate (vyžaduje vstup seøazený po skupinách)
+-- Stream Aggregate (requires input ordered by groups)
 SELECT MAX(ShipDate) FROM Sales.SalesOrderHeader
 
 
@@ -10,7 +9,7 @@ SELECT MAX(SalesOrderID) FROM Sales.SalesOrderHeader
 SELECT TOP 1 SalesOrderID FROM Sales.SalesOrderHeader ORDER BY SalesOrderID DESC
 
 
--- BTW: COUNT - jaký je rozdíl?
+-- BTW: COUNT - what is the difference?
 SELECT COUNT(*) FROM Sales.SalesOrderHeader
 SELECT COUNT(PurchaseOrderNumber) FROM Sales.SalesOrderHeader
 
@@ -21,4 +20,4 @@ SELECT SUM(SubTotal) FROM Sales.SalesOrderHeader
 
 
 -- Parallelism
-SELECT COUNT(*) FROM GoranSample.dbo.Times -- (114M záznamù)
+SELECT COUNT(*) FROM GoranSample.dbo.Times -- (114M records)

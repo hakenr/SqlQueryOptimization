@@ -1,5 +1,4 @@
-USE AdventureWorks2012
--- Zapnout Include Actual Execution Plan (Ctrl+M)
+-- Include Actual Execution Plan (Ctrl+M)
 
 
 -- Merge Join
